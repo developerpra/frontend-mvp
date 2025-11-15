@@ -1,0 +1,23 @@
+name: Build and Run Docker Image
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t my-react-app .
+
+      - name: Run Docker container
+        run: docker run -d -p 3000:3000 my-react-app
+
+      - name: Show running containers
+        run: docker ps
