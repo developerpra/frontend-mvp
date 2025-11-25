@@ -21,7 +21,6 @@ export const vessels = [
     status: "Active",
   },
 
-  // --- 100 more rows generated ---
   {
     id: 4,
     vesselName: "EBL-3001",
@@ -284,14 +283,4 @@ export const vessels = [
     branch: "Georgia",
     status: "Active",
   },
-
-  ...Array.from({ length: 60 }).map((_, i) => ({
-    id: 41 + i,
-    vesselName: `EBL-${3040 + i}`,
-    vesselType: ["Barge", "Tow"][Math.floor(Math.random() * 2)],
-    branch: ["Houston", "Texas", "Florida", "Louisiana", "New York", "Georgia"][
-      Math.floor(Math.random() * 6)
-    ],
-    status: ["Active", "Inactive"][Math.floor(Math.random() * 2)],
-  })),
 ];

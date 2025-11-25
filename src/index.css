@@ -8,18 +8,64 @@
   --kendo-color-primary-active: #14263b;
   --kendo-color-primary-border: #172e50;
 
-  --kendo-color-secondary: #64748b;
+  --kendo-color-secondary: #154993;
   --kendo-color-secondary-contrast: #ffffff;
+  --app-header-height: 0px;
+}
+
+@theme {
+  --color-primary: #172e50;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #64748b;
+  --color-secondary-foreground: #ffffff;
+}
+
+.k-button-solid-primary {
+  background-color: var(--kendo-color-primary) !important;
+  border-color: var(--kendo-color-primary) !important;
+  color: var(--kendo-color-primary-contrast) !important;
+}
+
+.k-button-solid-primary:hover,
+.k-button-solid-primary:focus-visible {
+  background-color: var(--kendo-color-primary-hover) !important;
+}
+
+.k-button-solid-primary:active {
+  background-color: var(--kendo-color-primary-active) !important;
+}
+
+.k-button-flat-primary {
+  color: var(--kendo-color-primary) !important;
+}
+
+.k-button-flat-primary:hover,
+.k-button-flat-primary:focus-visible {
+  color: var(--kendo-color-primary-hover) !important;
+  background-color: rgb(var(--kendo-color-primary-rgb) / 0.08) !important;
+}
+
+.k-button-flat-primary:active {
+  color: var(--kendo-color-primary-active) !important;
+  background-color: rgb(var(--kendo-color-primary-rgb) / 0.12) !important;
 }
 
 input {
   @apply h-9;
 }
-.k-tabstrip .k-active {
-  @apply bg-none border-none;
+.k-animation-container{
+  @apply w-full;
 }
 
+.k-tabstrip .k-active,
+.k-tabstrip .k-tabstrip-item:focus{
+  @apply bg-none border-none;
+}
+.k-tabstrip-items-wrapper .k-tabstrip-item:hover{
+  @apply text-primary;
+}
+
+/* tabs active border */
 .k-tabstrip .k-active .k-link {
-  /* @apply border-b border-2; */
-  border-bottom: 3px solid #172e50;
+  @apply border-b-3 border-primary;
 }

@@ -10,12 +10,20 @@ import {
   faPlus,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "sonner";
+
+type VesselOwner = {
+  id: number;
+  name: string;
+  eff: string;
+  exp: string;
+};
 
 export default function Information() {
   const [open1, setOpen1] = useState(true);
   const [open2, setOpen2] = useState(true);
   const [open3, setOpen3] = useState(true);
-  const [owners, setOwners] = useState([
+  const [owners, setOwners] = useState<VesselOwner[]>([
     {
       id: 1,
       name: "VESSEL MANAGEMENT",
@@ -27,15 +35,34 @@ export default function Information() {
   ]);
 
   const addOwner = () => {
-    setOwners([...owners, { id: Date.now(), name: "", eff: "", exp: "" }]);
+    const newOwner: VesselOwner = { id: Date.now(), name: "", eff: "", exp: "" };
+    setOwners([...owners, newOwner]);
   };
 
-  const updateOwner = (id, field, value) => {
+  const updateOwner = (id: number, field: keyof VesselOwner, value: string) => {
     setOwners(owners.map((o) => (o.id === id ? { ...o, [field]: value } : o)));
   };
 
-  const removeOwner = (id) => {
+  const removeOwner = (id: number) => {
     setOwners(owners.filter((o) => o.id !== id));
+  };
+
+  const handleSave = () => {
+    const payload = {
+      owners,
+      updatedAt: new Date().toISOString(),
+    };
+
+    toast.success("Information saved", {
+      description: (
+        <div className="text-left text-xs leading-relaxed">
+          <p className="font-semibold text-gray-900">
+            Owners updated: {owners.length}
+          </p>
+        
+        </div>
+      ),
+    });
   };
 
   return (
@@ -176,7 +203,9 @@ export default function Information() {
 
       {/* ACTION BUTTONS */}
       <div className="flex justify-end gap-4 pt-4">
-        <Button themeColor="primary">Save</Button>
+        <Button themeColor="primary" onClick={handleSave}>
+          Save
+        </Button>
         <Button>Cancel</Button>
       </div>
     </>

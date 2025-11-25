@@ -8,16 +8,8 @@ export default {
   ],
   safelist: ["bg-primary", "text-primary", "border-primary"],
   theme: {
-    extend: {
-      colors: {
-        primary: "#172e50",
-        onPrimary: "#ffffff",
-        kendo: {
-          primary: "#172e50",
-          onPrimary: "#ffffff",
-        },
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };
+

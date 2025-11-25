@@ -5,6 +5,7 @@ import Header from "./shared/components/Header";
 import ErrorBoundary from "./shared/error/ErrorBoundary";
 import ErrorLayout from "./layouts/ErrorLayout";
 import Sidebar from "./shared/components/Sidebar";
+import { Toaster } from "sonner";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           </ErrorBoundary>
         </main>
       </div>
+      <Toaster position="top-right" richColors />
     </BrowserRouter>
   );
 }

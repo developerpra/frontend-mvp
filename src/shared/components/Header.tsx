@@ -1,12 +1,39 @@
-import { DropDownList } from "@progress/kendo-react-dropdowns";
-import { Button } from "@progress/kendo-react-buttons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faStar, faUser } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useRef } from "react";
 
 export default function Header() {
+  const headerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !headerRef.current) {
+      return;
+    }
+
+    const updateHeight = () => {
+      if (!headerRef.current) {
+        return;
+      }
+      document.documentElement.style.setProperty(
+        "--app-header-height",
+        `${headerRef.current.offsetHeight}px`
+      );
+    };
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(headerRef.current);
+    window.addEventListener("resize", updateHeight);
+    updateHeight();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateHeight);
+    };
+  }, []);
+
   return (
-    <div className="w-full shadow-md">
-      <div className="bg-[#0d2b53] text-white px-4 py-2 flex items-center gap-4">
+    <div ref={headerRef} className="sticky top-0 z-40 w-full shadow-md">
+      <div className="bg-primary text-white px-4 py-2 flex items-center gap-4">
         <div className="font-bold text-lg tracking-wide">CAMIN</div>
 
         {/* SEARCH INPUT */}
@@ -51,7 +78,7 @@ export default function Header() {
       </div>
 
       {/* SECOND NAV (TAB STYLE) */}
-      <div className="bg-[#123765] text-white text-sm px-4 py-2 flex gap-6 overflow-x-auto">
+      <div className="bg-primary text-white text-sm px-4 py-2 flex gap-6 overflow-x-auto">
         {[
           "SAV-3184",
           "SHIPS",

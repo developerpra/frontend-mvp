@@ -3,14 +3,60 @@ import {
   DropDownList,
   DropDownListChangeEvent,
 } from "@progress/kendo-react-dropdowns";
+import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { Input } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
-import { Grid, GridColumn } from "@progress/kendo-react-grid";
+import { Grid, GridCellProps, GridColumn } from "@progress/kendo-react-grid";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEye,
+  faPenToSquare,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { vessels } from "../../dummyData";
-import { BranchCell } from "../BranchCell";
 
 const vesselTypes = ["Barge", "Tow", "Ship"];
 const vesselNames = ["EBL-2869", "EBL-2900", "EBL - 2971 & 2972"];
+
+const ActionCell = (_props: GridCellProps) => (
+  <td className="flex items-center justify-center gap-3 text-lg">
+    <button
+      type="button"
+      title="View"
+      className="text-blue-600 hover:text-blue-700 transition-colors"
+    >
+      <FontAwesomeIcon icon={faEye} />
+    </button>
+    <button
+      type="button"
+      title="Edit"
+      className="text-amber-600 hover:text-amber-700 transition-colors"
+    >
+      <FontAwesomeIcon icon={faPenToSquare} />
+    </button>
+    <button
+      type="button"
+      title="Delete"
+      className="text-red-600 hover:text-red-700 transition-colors"
+    >
+      <FontAwesomeIcon icon={faTrash} />
+    </button>
+  </td>
+);
+
+const BranchCell = (props: GridCellProps) => {
+  return (
+    <td className="flex items-center gap-2 px-2">
+      <FontAwesomeIcon icon={faLocationDot} className="text-red-500" />
+      <a
+        href={`/branch/${props.dataItem.branch}`}
+        className="text-blue-600 underline hover:text-blue-800"
+      >
+        {props.dataItem.branch}
+      </a>
+    </td>
+  );
+};
 
 export default function VesselPage() {
   const [filters, setFilters] = useState({
@@ -141,21 +187,23 @@ export default function VesselPage() {
           total={data.length}
           pageable={true}
           onPageChange={handlePageChange}
-          cell={BranchCell}
         >
           <GridColumn field="vesselName" title="Vessel Name" />
           <GridColumn field="vesselType" title="Vessel Type" />
-          <GridColumn field="branch" title="Branch" />
+          <GridColumn
+            field="branch"
+            title="Branch"
+            cells={{
+              data: BranchCell,
+            }}
+          />
 
           <GridColumn
+            field="action"
             title="Action"
-            cell={(props) => (
-              <td className="space-x-4 text-center">
-                <span className="cursor-pointer text-blue-600">👁</span>
-                <span className="cursor-pointer text-green-600">✏️</span>
-                <span className="cursor-pointer text-red-600">🗑</span>
-              </td>
-            )}
+            cells={{
+              data: ActionCell,
+            }}
           />
         </Grid>
       </div>
