@@ -1,7 +1,7 @@
 import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { Button } from "@progress/kendo-react-buttons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faBell, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faStar, faUser } from "@fortawesome/free-solid-svg-icons";
 
 export default function Header() {
   return (
@@ -45,7 +45,7 @@ export default function Header() {
         {/* ICONS SECTION */}
         <div className="flex items-center gap-6 text-xl">
           <FontAwesomeIcon icon={faHome} className="cursor-pointer" />
-          <FontAwesomeIcon icon={faBell} className="cursor-pointer" />
+          <FontAwesomeIcon icon={faStar} className="cursor-pointer" />
           <FontAwesomeIcon icon={faUser} className="cursor-pointer" />
         </div>
       </div>

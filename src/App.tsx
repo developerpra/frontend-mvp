@@ -12,11 +12,9 @@ export default function App() {
       <Header />
 
       <div className="flex min-h-screen">
-        {/* Sidebar */}
         <Sidebar />
 
-        {/* Main Content */}
-        <main className="flex-1 p-4 bg-gray-50">
+        <main className="flex-1 bg-gray-50">
           <ErrorBoundary
             fallback={({ error }) => <ErrorLayout error={error} />}
           >

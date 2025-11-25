@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-// Tree-shaken icon imports
 import {
   faChevronLeft,
-  faChevronRight,
+  faBars,
   faHome,
+  faHammer,
 } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <aside
-      className={`h-screen bg-gray-100 border-r shadow-sm
+      className={`h-screen z-10 bg-gray-100 shadow-[3px_0_6px_rgba(0,0,0,0.15)]
         transition-all duration-300 
         ${open ? "w-40" : "w-16"}
       `}
@@ -28,7 +29,7 @@ export default function Sidebar() {
           />
         ) : (
           <FontAwesomeIcon
-            icon={faChevronRight}
+            icon={faBars}
             onClick={() => setOpen(true)}
             className="w-6 h-6 text-gray-700 hover:text-blue-600 transition"
           />
@@ -37,12 +38,21 @@ export default function Sidebar() {
 
       {/* MENU */}
       <div className="mt-6 flex flex-col items-center gap-6">
-        <button className="flex items-center gap-4 text-gray-700 hover:text-blue-600">
+        <button
+          className="flex items-center gap-4 text-gray-700 hover:text-blue-600"
+          onClick={() => navigate("/")}
+        >
           <FontAwesomeIcon icon={faHome} className="w-6 h-6" />
           {open && <span className="text-sm font-medium">Home</span>}
         </button>
 
-        {/* Add more items here */}
+        <button
+          className="flex items-center gap-4 text-gray-700 hover:text-blue-600"
+          onClick={() => navigate("/Maintenance")}
+        >
+          <FontAwesomeIcon icon={faHammer} className="w-6 h-6" />
+          {open && <span className="text-sm font-medium">Maintenance</span>}
+        </button>
       </div>
     </aside>
   );

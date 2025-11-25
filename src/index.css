@@ -1,11 +1,25 @@
 @import "tailwindcss";
 
-/* Kendo Theme Override */
-@layer base {
-  :root {
-    --kendo-color-primary: #3b82f6; /* Tailwind blue-500 */
-    --kendo-color-secondary: #64748b; /* Slate-500 */
-  }
+:root {
+  --kendo-color-primary: #172e50;
+  --kendo-color-primary-rgb: 23, 46, 80;
+  --kendo-color-primary-contrast: #ffffff;
+  --kendo-color-primary-hover: #203656;
+  --kendo-color-primary-active: #14263b;
+  --kendo-color-primary-border: #172e50;
+
+  --kendo-color-secondary: #64748b;
+  --kendo-color-secondary-contrast: #ffffff;
 }
 
-/* Kendo overrides go here later */
+input {
+  @apply h-9;
+}
+.k-tabstrip .k-active {
+  @apply bg-none border-none;
+}
+
+.k-tabstrip .k-active .k-link {
+  /* @apply border-b border-2; */
+  border-bottom: 3px solid #172e50;
+}
