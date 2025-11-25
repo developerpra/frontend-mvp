@@ -6,7 +6,7 @@ export default function GuardedRoute({
   element,
   isPwa,
 }: {
-  element: JSX.Element;
+  element: TSX.Element;
   isPwa: boolean;
 }) {
   const online = useOnlineStatus();

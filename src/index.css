@@ -1,11 +1,11 @@
-/* Kindo Theme Override */
-:root {
-  --kendo-color-primary: #3b82f6; /* Tailwind blue-500 */
-  --kendo-color-secondary: #64748b; /* Slate-500 */
-}
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Kendo Theme Override */
+@layer base {
+  :root {
+    --kendo-color-primary: #3b82f6; /* Tailwind blue-500 */
+    --kendo-color-secondary: #64748b; /* Slate-500 */
+  }
+}
 
 /* Kendo overrides go here later */
