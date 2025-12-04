@@ -6,6 +6,7 @@ import ErrorBoundary from "./shared/error/ErrorBoundary";
 import ErrorLayout from "./layouts/ErrorLayout";
 import Sidebar from "./shared/components/Sidebar";
 import { Toaster } from "sonner";
+import Loading from "./shared/components/Loading";
 
 export default function App() {
   return (
@@ -19,7 +20,7 @@ export default function App() {
           <ErrorBoundary
             fallback={({ error }) => <ErrorLayout error={error} />}
           >
-            <Suspense fallback={<div className="p-4">Loading...</div>}>
+            <Suspense fallback={<Loading />}>
               <AppRoutes />
             </Suspense>
           </ErrorBoundary>

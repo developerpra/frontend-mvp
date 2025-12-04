@@ -1,12 +1,12 @@
 import { TabStrip, TabStripTab } from "@progress/kendo-react-layout";
 import { useState } from "react";
-import Vessal from "./Vessal/Vessel";
-import VessalInformation from "./Vessal/Information";
-import Compartments from "./Vessal/Compartments";
-import AuditLog from "./Vessal/AuditLog";
-import { Button } from "@progress/kendo-react-buttons";
+import Vessel from "./Vessel/Vessel";
+import VesselInformation from "./Vessel/Information";
+import Compartments from "./Vessel/Compartments";
+import AuditLog from "./Vessel/AuditLog";
+import { vessel } from "../dummyData/VesselInformation";
 
-export default function VessalTabs({ className }) {
+export default function VesselTabs({ className }) {
   const [selected, setSelected] = useState(0);
 
   const handleSelect = (e) => {
@@ -14,31 +14,29 @@ export default function VessalTabs({ className }) {
   };
 
   return (
-    <>
-     
-      <TabStrip
-        selected={selected}
-        onSelect={handleSelect}
-        scrollable={true}
-        size={"large"}
-        className={className}
-      >
-        <TabStripTab title="Vessal">
-          <Vessal />
-        </TabStripTab>
+    <TabStrip
+      selected={selected}
+      onSelect={handleSelect}
+      scrollable={true}
+      size={"large"}
+      className={`${className}`}
+    >
+      <TabStripTab title="Vessel">
+        <Vessel />
+      </TabStripTab>
 
-        <TabStripTab title="Vessal Information">
-          <VessalInformation />
-        </TabStripTab>
+      <TabStripTab title="Vessel Information">
+        {/* <VesselInformation mode="edit" /> */}
+        <VesselInformation mode="view" data={vessel} />
+      </TabStripTab>
 
-        <TabStripTab title="Vessal Comartments">
-          <Compartments />
-        </TabStripTab>
+      <TabStripTab title="Vessel Compartments">
+        <Compartments mode="edit" />
+      </TabStripTab>
 
-        <TabStripTab title="Vessal Comartments">
-          <AuditLog />
-        </TabStripTab>
-      </TabStrip>
-    </>
+      <TabStripTab title="Audit Log">
+        <AuditLog />
+      </TabStripTab>
+    </TabStrip>
   );
 }

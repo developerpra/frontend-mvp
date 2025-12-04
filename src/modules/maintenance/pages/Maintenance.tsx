@@ -1,10 +1,10 @@
-import VessalTabs from "../components/VesselInformation";
+import VesselTabs from "../components/VesselInformation";
 import PageTitle from "../../../shared/components/PageTitle";
 export default function Maintenance() {
   return (
     <>
-      <PageTitle text="Vessal Information" />
-      <VessalTabs className="p-4" />
+      <PageTitle text="Vessel Information" />
+      <VesselTabs className="p-4" />
     </>
   );
 }

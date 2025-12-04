@@ -26,7 +26,6 @@ export default function AppRoutes() {
       path: "/pwa-1",
       element: <GuardedRoute element={<Pwa1Home />} isPwa={true} />,
     },
-
     { path: "*", element: <NotFound /> },
   ]);
 }

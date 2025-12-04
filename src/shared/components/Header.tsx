@@ -1,9 +1,25 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faStar, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef } from "react";
+import { Input } from "@progress/kendo-react-inputs";
+import map from "lodash-es/map";
 
 export default function Header() {
   const headerRef = useRef<HTMLDivElement | null>(null);
+  const columns = [
+    "SAV-3184",
+    "SHIPS",
+    "Discharge",
+    "American Pride",
+    "MCK - Jacksonville",
+    "ULSD",
+    "01-Jan-2023",
+    "01-Jan-2023",
+    "Working",
+    "Reported",
+    "Retain",
+    "Issued",
+  ];
 
   useEffect(() => {
     if (typeof window === "undefined" || !headerRef.current) {
@@ -38,32 +54,14 @@ export default function Header() {
 
         {/* SEARCH INPUT */}
         <div className="relative w-64">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="px-4 py-2 border rounded bg-white text-black text-sm focus:outline-none w-full"
-          />
+          <Input placeholder="Search..." />
           {/* <span className="absolute right-3 top-2.5 text-gray-500">🔍</span> */}
         </div>
 
         <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Invoice Number..."
-            className="px-4 py-2 border rounded bg-white text-black text-sm focus:outline-none"
-          />
-
-          <input
-            type="text"
-            placeholder="File Number..."
-            className="px-4 py-2 border rounded bg-white text-black text-sm focus:outline-none"
-          />
-
-          <input
-            type="text"
-            placeholder="Order Number..."
-            className="px-4 py-2 border rounded bg-white text-black text-sm focus:outline-none"
-          />
+          <Input placeholder="Invoice Number..." />
+          <Input placeholder="File Number..." />
+          <Input placeholder="Order Number..." />
         </div>
 
         {/* SPACER */}
@@ -79,20 +77,7 @@ export default function Header() {
 
       {/* SECOND NAV (TAB STYLE) */}
       <div className="bg-primary text-white text-sm px-4 py-2 flex gap-6 overflow-x-auto">
-        {[
-          "SAV-3184",
-          "SHIPS",
-          "Discharge",
-          "American Pride",
-          "MCK - Jacksonville",
-          "ULSD",
-          "01-Jan-2023",
-          "01-Jan-2023",
-          "Working",
-          "Reported",
-          "Retain",
-          "Issued",
-        ].map((item, index) => (
+        {map(columns, (item, index) => (
           <div
             key={index}
             className="cursor-pointer hover:text-yellow-300 whitespace-nowrap"

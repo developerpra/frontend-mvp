@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
-import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
+import {
+  faStar as faStarSolid,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@progress/kendo-react-buttons";
 
-export default function PageTitle({ text }: { text: string }  ) {
+export default function PageTitle({ text }: { text: string }) {
   const [fav, setFav] = useState(false);
 
   return (
@@ -18,9 +21,12 @@ export default function PageTitle({ text }: { text: string }  ) {
         />
       </div>
       <div className="flex gap-2">
-        <Button themeColor="primary">+ Add</Button>
         <Button fillMode="flat" themeColor="primary">
-          Referance
+          Reference
+        </Button>
+        <Button themeColor="primary" className="w-16">
+          <FontAwesomeIcon icon={faPlus} className="mr-1" />
+          Add
         </Button>
       </div>
     </div>

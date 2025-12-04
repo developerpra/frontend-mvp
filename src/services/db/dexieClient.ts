@@ -8,7 +8,6 @@ export interface Order {
 
 export class AppDB extends Dexie {
   orders!: Table<Order, number>;
-
   constructor() {
     super("MyAppDatabase");
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../services/api/apiWrapper";
 import { API_ENDPOINTS } from "../../../services/api/apiEndpoints";
+import Loading from "@/shared/components/Loading";
 
 export default function ProductsTest() {
   const [products, setProducts] = useState<any[]>([]);
@@ -21,7 +22,7 @@ export default function ProductsTest() {
     load();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loading />;
 
   return (
     <div style={{ padding: 20 }}>

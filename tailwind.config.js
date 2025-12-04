@@ -1,3 +1,4 @@
+import autocorrect from "tailwindcss-autocorrect";
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
@@ -10,6 +11,5 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [autocorrect()],
 };
-

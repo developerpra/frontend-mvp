@@ -6,4 +6,3 @@ declare module "@progress/kendo-react-grid" {
     cell?: ComponentType<GridCellProps>;
   }
 }
-
