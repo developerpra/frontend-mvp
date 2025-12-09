@@ -97,7 +97,12 @@ input,
 .k-animation-container {
   @apply w-full;
 }
-
+.k-tabstrip-content {
+  @apply p-0;
+}
+.col-vessel {
+  min-width: 120px;
+}
 .k-tabstrip .k-active,
 .k-tabstrip .k-tabstrip-item:focus {
   @apply bg-none border-none;
@@ -106,8 +111,8 @@ input,
   @apply text-primary;
 }
 
-.k-tabstrip .k-tabstrip-item {
-  @apply !bg-transparent;
+.k-tabstrip .k-tabstrip-items .k-tabstrip-item {
+  @apply px-2 text-sm md:px-4 md:text-base !bg-transparent;
 }
 
 /* Make Kendo TabStrip titles bold */

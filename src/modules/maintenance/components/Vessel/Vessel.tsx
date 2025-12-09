@@ -119,7 +119,7 @@ export default function VesselPage() {
       <div className="border border-gray-300 rounded-lg p-4 bg-white space-y-4">
         <h3 className="font-bold text-gray-700">Filters</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="space-y-1">
             <label className="font-medium">Vessel</label>
             <DropDownList
@@ -163,10 +163,10 @@ export default function VesselPage() {
           </div>
 
           {/* Status */}
-          <div className="mt-4 w-fit h-fit">
+          <div className="md:mt-5 w-fit h-fit">
             <ButtonGroup>
               <Button
-                className="w-16 mt-1"
+                className="w-16"
                 onClick={() => setStatus("Active")}
                 themeColor="primary"
                 fillMode={status === "Active" ? "solid" : "outline"}
@@ -175,7 +175,7 @@ export default function VesselPage() {
               </Button>
 
               <Button
-                className="w-16 mt-1"
+                className="w-16"
                 onClick={() => setStatus("Inactive")}
                 themeColor="primary"
                 fillMode={status === "Inactive" ? "solid" : "outline"}
@@ -184,20 +184,21 @@ export default function VesselPage() {
               </Button>
             </ButtonGroup>
           </div>
-        </div>
 
-        {/* Buttons */}
-        <div className="flex gap-4 ">
-          <Button themeColor="primary" onClick={handleSearch}>
-            Search
-          </Button>
-          <Button onClick={clearFilters}>Clear Filters</Button>
+          {/* Buttons */}
+          <div className="flex gap-4">
+            <Button themeColor="primary" onClick={handleSearch}>
+              Search
+            </Button>
+            <Button onClick={clearFilters}>Clear Filters</Button>
+          </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="border border-gray-300 rounded-lg bg-white mt-4">
+      <div className="border border-gray-300 rounded-lg bg-white mt-4 overflow-auto">
         <Grid
+          className="w-screen"
           data={data?.slice(page.skip, page.skip + page.take)}
           skip={page?.skip}
           take={page?.take}
@@ -208,7 +209,11 @@ export default function VesselPage() {
           }}
           onPageChange={handlePageChange}
         >
-          <GridColumn field="vesselName" title="Vessel Name" />
+          <GridColumn
+            className="col-vessel"
+            field="vesselName"
+            title="Vessel Name"
+          />
           <GridColumn field="vesselType" title="Vessel Type" />
           <GridColumn field="id" title="IMO Number" />
           <GridColumn

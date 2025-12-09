@@ -15,7 +15,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`sticky z-30 bg-gray-100 shadow-[3px_0_6px_rgba(0,0,0,0.15)]
+      className={`hidden sticky z-30 bg-gray-100 shadow-[3px_0_6px_rgba(0,0,0,0.15)]
         transition-all duration-300 overflow-y-auto
         ${open ? "w-40" : "w-16"}
       `}
@@ -42,7 +42,9 @@ export default function Sidebar() {
       </div>
 
       {/* MENU */}
-      <div className={`mt-6 flex flex-col items-center gap-6 ${open ? "items-start px-4" : "items-center"}`}>
+      <div
+        className={`mt-6 flex flex-col items-center gap-6 ${open ? "items-start px-4" : "items-center"}`}
+      >
         <button
           className="flex items-center gap-4 text-gray-700 hover:text-blue-600"
           onClick={() => navigate("/")}

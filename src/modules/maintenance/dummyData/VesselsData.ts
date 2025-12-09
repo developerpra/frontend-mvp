@@ -4,6 +4,7 @@ export const vessels = [
     vesselName: "EBL-2869",
     vesselType: "Barge",
     branch: "Houston",
+    IMONumber: 1234,
     status: "Active",
   },
   {

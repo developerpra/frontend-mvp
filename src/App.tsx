@@ -13,7 +13,7 @@ export default function App() {
     <BrowserRouter>
       <Header />
 
-      <div className="flex min-h-screen">
+      <div className="lg:flex min-h-screen">
         <Sidebar />
 
         <main className="flex-1 bg-gray-50">

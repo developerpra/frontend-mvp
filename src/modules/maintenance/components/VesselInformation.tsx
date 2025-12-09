@@ -18,8 +18,8 @@ export default function VesselTabs({ className }) {
       selected={selected}
       onSelect={handleSelect}
       scrollable={true}
-      size={"large"}
-      className={`${className}`}
+      size="large"
+      className={`w-full ${className}`}
     >
       <TabStripTab title="Vessel">
         <Vessel />
@@ -27,7 +27,7 @@ export default function VesselTabs({ className }) {
 
       <TabStripTab title="Vessel Information">
         {/* <VesselInformation mode="edit" /> */}
-        <VesselInformation mode="view" data={vessel} />
+        <VesselInformation mode="edit" data={vessel} />
       </TabStripTab>
 
       <TabStripTab title="Vessel Compartments">

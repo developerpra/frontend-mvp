@@ -206,7 +206,7 @@ export default function VesselInformation({
         </div>
 
         {open1 && (
-          <div className="p-4 grid grid-cols-4 gap-4">
+          <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {mode === "edit" ? (
               <Input
                 label="Vessel Name"
@@ -385,7 +385,7 @@ export default function VesselInformation({
         </div>
 
         {open2 && (
-          <div className="p-4 grid grid-cols-4 gap-4">
+          <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-4">
             {mode === "edit" ? (
               <Input
                 label="Beam"
@@ -740,7 +740,7 @@ export default function VesselInformation({
               owners.map((o) => (
                 <div
                   key={o.id}
-                  className="flex gap-4 items-center border border-gray-300 p-3 rounded"
+                  className="flex flex-wrap gap-4 items-center border border-gray-300 p-3 rounded"
                 >
                   <Input
                     label="Vessel Owner"

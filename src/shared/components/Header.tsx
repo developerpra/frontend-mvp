@@ -1,5 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faStar, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faHome,
+  faStar,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef } from "react";
 import { Input } from "@progress/kendo-react-inputs";
 import map from "lodash-es/map";
@@ -46,10 +51,18 @@ export default function Header() {
       window.removeEventListener("resize", updateHeight);
     };
   }, []);
-
+  const handleMobileSidebar = () => {
+    alert("done");
+  };
   return (
     <div ref={headerRef} className="sticky top-0 z-40 w-full shadow-md">
-      <div className="bg-primary text-white px-4 py-2 flex items-center gap-4">
+      <div className="bg-primary w-full text-white px-4 py-2 flex items-center gap-4">
+        <FontAwesomeIcon
+          onClick={handleMobileSidebar}
+          icon={faBars}
+          className="cursor-pointer !lg:hidden"
+        />
+
         <div className="font-bold text-lg tracking-wide">CAMIN</div>
 
         {/* SEARCH INPUT */}
@@ -58,7 +71,7 @@ export default function Header() {
           {/* <span className="absolute right-3 top-2.5 text-gray-500">🔍</span> */}
         </div>
 
-        <div className="flex gap-2">
+        <div className="hidden lg:flex gap-2">
           <Input placeholder="Invoice Number..." />
           <Input placeholder="File Number..." />
           <Input placeholder="Order Number..." />
@@ -68,7 +81,7 @@ export default function Header() {
         <div className="flex-1"></div>
 
         {/* ICONS SECTION */}
-        <div className="flex items-center gap-6 text-xl">
+        <div className="flex items-center gap-4 xl:gap-6 lg:text-xl">
           <FontAwesomeIcon icon={faHome} className="cursor-pointer" />
           <FontAwesomeIcon icon={faStar} className="cursor-pointer" />
           <FontAwesomeIcon icon={faUser} className="cursor-pointer" />
@@ -76,7 +89,7 @@ export default function Header() {
       </div>
 
       {/* SECOND NAV (TAB STYLE) */}
-      <div className="bg-primary text-white text-sm px-4 py-2 flex gap-6 overflow-x-auto">
+      <div className="flex bg-primary text-white text-sm px-4 py-2 gap-6 overflow-x-auto">
         {map(columns, (item, index) => (
           <div
             key={index}

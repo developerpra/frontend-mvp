@@ -9,7 +9,11 @@ export default {
   ],
   safelist: ["bg-primary", "text-primary", "border-primary"],
   theme: {
-    extend: {},
+    extend: {
+      minWidth: {
+        25: "100px",
+      },
+    },
   },
   plugins: [autocorrect()],
 };
