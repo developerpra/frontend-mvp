@@ -93,6 +93,9 @@ input,
 .k-button {
   @apply h-9;
 }
+label {
+  @apply font-medium;
+}
 .k-dropdownlist.k-picker,
 .k-input {
   @apply mt-1;

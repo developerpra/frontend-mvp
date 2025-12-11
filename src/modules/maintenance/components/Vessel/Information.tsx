@@ -184,7 +184,6 @@ export default function VesselInformation({
   };
 
   const handleCancel = () => {
-    // simple revert to original data prop (if any)
     if (data) {
       setVesselName(data.vesselName ?? "");
       setVesselType(data.vesselType ?? "");
@@ -213,16 +212,15 @@ export default function VesselInformation({
           className="flex justify-between items-center bg-gray-100 px-4 py-2 cursor-pointer"
           onClick={() => setOpen1((s) => !s)}
         >
-          <h3 className="font-bold text-gray-700">General Information</h3>
+          <h3 className="font-bold text-gray-700">Key Information</h3>
           <FontAwesomeIcon icon={open1 ? faChevronUp : faChevronDown} />
         </div>
 
         {open1 && (
-          <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {mode === "edit" ? (
               <Input
-                label="Vessel Name"
-                labelClassName="font-medium"
+                label={<span>Vessel Name <span className="text-red-500">*</span></span>}
                 value={vesselName}
                 placeholder=" "
                 onChange={(e) => setVesselName(String(e.value || ""))}
@@ -233,7 +231,7 @@ export default function VesselInformation({
 
             {mode === "edit" ? (
               <div className="space-y-1">
-                <label className="font-medium">Vessel Type</label>
+                <label>Vessel Type <span className="text-red-500">*</span></label>
                 <DropDownList
                   className="!bg-transparent"
                   placeholder="Select Vessel Type"
@@ -248,8 +246,7 @@ export default function VesselInformation({
 
             {mode === "edit" ? (
               <Input
-                label="IMO Number"
-                labelClassName="font-medium"
+                label="IMO Number"  
                 value={imo}
                 placeholder=" "
                 onChange={(e) => setImo(String(e.value || ""))}
@@ -260,62 +257,78 @@ export default function VesselInformation({
 
             {/* Active + Branch */}
             <div
-              className={`flex ${mode === "edit" ? "mt-2 items-center gap-4" : "flex-col gap-1"}`}
+              className={`flex ${mode === "edit" ? "mt-2 items-between gap-4" : "flex-col gap-1"}`}
             >
               {mode === "edit" ? (
                 <>
-                  <Checkbox
-                    checked={active}
-                    label="Active"
-                    onChange={(e: CheckboxChangeEvent) => setActive(Boolean(e.value))}
-                  />
-                  <div className="flex items-center gap-1">
+                  <div>
+                    <label htmlFor="">Vessel Status</label>
+                    <Checkbox
+                      checked={active}
+                      label="Active"
+                      onChange={(e: CheckboxChangeEvent) => setActive(Boolean(e.value))}
+                      />
+                  </div>
+                  <div>
+                    <label htmlFor="">Ocean Going</label>
+                    <Checkbox
+                      checked={active}
+                      label="Yes"
+                      onChange={(e: CheckboxChangeEvent) => setActive(Boolean(e.value))}
+                      />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-sm font-medium">Branch</label>
                     <FontAwesomeIcon
                       icon={faLocationDot}
                       onClick={toggleDialog}
-                      className="text-primary"
+                      className="text-primary mt-1"
                     />
-                    <label className="text-sm font-medium">Branch</label>
                   </div>
                 </>
               ) : (
                 <>
                   <label className="font-medium text-gray-600">Active</label>
                   <FontAwesomeIcon icon={active ? faCheck : faXmark} />
-                  {/* <ReadonlyField label="Active" value={active ? "Yes" : "No"} /> */}
-                  {/* <ReadonlyField label="Branch" value={branch} /> */}
                 </>
               )}
             </div>
 
-            {mode === "edit" ? (
+              {mode === "edit" ? (
               <Input
-                label="VET Units"
-                labelClassName="font-medium"
-                value={vetUnits}
+                label="Former Name"
+                
                 placeholder=" "
-                onChange={(e) => setVetUnits(String(e.value || ""))}
+                value={additional["formerName"] ?? ""}
+                onChange={(e) =>
+                  setAdditional((p) => ({ ...p, formerName: String(e.value || "") }))
+                }
               />
             ) : (
-              <ReadonlyField label="VET Units" value={vetUnits} />
+              <ReadonlyField
+                label="Former Name"
+                value={additional["formerName"] ?? ""}
+              />
             )}
 
             {mode === "edit" ? (
-              <Input
-                label="Draft Unit"
-                labelClassName="font-medium"
-                value={draftUnit}
-                placeholder=" "
-                onChange={(e) => setDraftUnit(String(e.value || ""))}
-              />
+              <>
+                <label>volume Unit</label>
+                <DropDownList
+                  className="!bg-transparent"
+                  value={volumeUnit}
+                  placeholder="Select Volume Unit"
+                  data={["Barrels", "Cubic Meters", "Liters"]}
+                  onChange={(e) => setVolumeUnit(String(e.value || ""))}
+                />
+             </>
             ) : (
-              <ReadonlyField label="Draft Unit" value={draftUnit} />
+              <ReadonlyField label="Volume Unit" value={volumeUnit} />
             )}
 
-            {mode === "edit" ? (
+             {mode === "edit" ? (
               <Input
                 label="Gauge Unit"
-                labelClassName="font-medium"
                 value={gaugeUnit}
                 placeholder=" "
                 onChange={(e) => setGaugeUnit(String(e.value || ""))}
@@ -324,22 +337,32 @@ export default function VesselInformation({
               <ReadonlyField label="Gauge Unit" value={gaugeUnit} />
             )}
 
-            {mode === "edit" ? (
+             {mode === "edit" ? (
               <Input
-                label="Volume Unit"
-                labelClassName="font-medium"
-                value={volumeUnit}
+                label="Draft Unit"
+                value={draftUnit}
                 placeholder=" "
-                onChange={(e) => setVolumeUnit(String(e.value || ""))}
+                onChange={(e) => setDraftUnit(String(e.value || ""))}
               />
             ) : (
-              <ReadonlyField label="Volume Unit" value={volumeUnit} />
+              <ReadonlyField label="Draft Unit" value={draftUnit} />
+            )}
+
+            {/* VEF Units */}
+            {mode === "edit" ? (
+              <Input
+                label="VEF Units"
+                value={vetUnits}
+                placeholder=" "
+                onChange={(e) => setVetUnits(String(e.value || ""))}
+              />
+            ) : (
+              <ReadonlyField label="VEF Units" value={vetUnits} />
             )}
 
             {mode === "edit" ? (
               <Input
                 label="Vessel Capacity"
-                labelClassName="font-medium"
                 value={vesselCapacity}
                 placeholder=" "
                 onChange={(e) => setVesselCapacity(String(e.value || ""))}
@@ -350,106 +373,8 @@ export default function VesselInformation({
 
             {mode === "edit" ? (
               <Input
-                label="Compartments"
-                labelClassName="font-medium"
-                value={compartments}
-                placeholder=" "
-                onChange={(e) => setCompartments(String(e.value || ""))}
-              />
-            ) : (
-              <ReadonlyField label="Compartments" value={compartments} />
-            )}
-
-            {mode === "edit" ? (
-              <Input
-                label="Sand Pipe"
-                labelClassName="font-medium"
-                value={sandPipe}
-                placeholder=" "
-                onChange={(e) => setSandPipe(String(e.value || ""))}
-              />
-            ) : (
-              <ReadonlyField label="Sand Pipe" value={sandPipe} />
-            )}
-
-            {mode === "edit" ? (
-              <Input
-                label="Length Overall"
-                labelClassName="font-medium"
-                value={lengthOverall}
-                placeholder=" "
-                onChange={(e) => setLengthOverall(String(e.value || ""))}
-              />
-            ) : (
-              <ReadonlyField label="Length Overall" value={lengthOverall} />
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* ADDITIONAL INFORMATION */}
-      <div className="border border-gray-300 my-6 rounded">
-        <div
-          className="flex justify-between items-center bg-gray-100 px-4 py-2 cursor-pointer"
-          onClick={() => setOpen2((s) => !s)}
-        >
-          <h3 className="font-bold text-gray-700">Additional Information</h3>
-          <FontAwesomeIcon icon={open2 ? faChevronUp : faChevronDown} />
-        </div>
-
-        {open2 && (
-          <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-4">
-            {mode === "edit" ? (
-              <Input
-                label="Beam"
-                labelClassName="font-medium"
-                value={additional["beam"] ?? ""}
-                onChange={(e) =>
-                  setAdditional((p) => ({ ...p, beam: String(e.value || "") }))
-                }
-              />
-            ) : (
-              <ReadonlyField label="Beam" value={additional["beam"] ?? ""} />
-            )}
-
-            {mode === "edit" ? (
-              <Input
-                label="Draught"
-                labelClassName="font-medium"
-                placeholder=" "
-                value={additional["draught"] ?? ""}
-                onChange={(e) =>
-                  setAdditional((p) => ({ ...p, draught: String(e.value || "") }))
-                }
-              />
-            ) : (
-              <ReadonlyField
-                label="Draught"
-                value={additional["draught"] ?? ""}
-              />
-            )}
-
-            {mode === "edit" ? (
-              <Input
-                label="Vessel Line Capacity"
-                labelClassName="font-medium"
-                placeholder=" "
-                value={additional["vesselLine"] ?? ""}
-                onChange={(e) =>
-                  setAdditional((p) => ({ ...p, vesselLine: String(e.value || "") }))
-                }
-              />
-            ) : (
-              <ReadonlyField
-                label="Vessel Line Capacity"
-                value={additional["vesselLine"] ?? ""}
-              />
-            )}
-
-            {mode === "edit" ? (
-              <Input
                 label="Vessel Connection Type"
-                labelClassName="font-medium"
+                
                 placeholder=" "
                 value={additional["connectionType"] ?? ""}
                 onChange={(e) =>
@@ -465,101 +390,36 @@ export default function VesselInformation({
 
             {mode === "edit" ? (
               <Input
-                label="Ballast"
-                labelClassName="font-medium"
+                label="Sand Pipe"
+                value={sandPipe}
                 placeholder=" "
-                value={additional["ballast"] ?? ""}
-                onChange={(e) =>
-                  setAdditional((p) => ({ ...p, ballast: String(e.value || "") }))
-                }
+                onChange={(e) => setSandPipe(String(e.value || ""))}
               />
             ) : (
-              <ReadonlyField
-                label="Ballast"
-                value={additional["ballast"] ?? ""}
-              />
+              <ReadonlyField label="Sand Pipe" value={sandPipe} />
             )}
 
             {mode === "edit" ? (
               <Input
-                label="Manifold Location"
-                labelClassName="font-medium"
+                label="Vessel Deck Line Capacity"
+                
                 placeholder=" "
-                value={additional["manifold"] ?? ""}
+                value={additional["vesselLine"] ?? ""}
                 onChange={(e) =>
-                  setAdditional((p) => ({ ...p, manifold: String(e.value || "") }))
+                  setAdditional((p) => ({ ...p, vesselLine: String(e.value || "") }))
                 }
               />
             ) : (
               <ReadonlyField
-                label="Manifold Location"
-                value={additional["manifold"] ?? ""}
-              />
-            )}
-
-            {mode === "edit" ? (
-              <Input
-                label="LOP"
-                labelClassName="font-medium"
-                placeholder=" "
-                value={additional["lop"] ?? ""}
-                onChange={(e) => setAdditional((p) => ({ ...p, lop: String(e.value || "") }))}
-              />
-            ) : (
-              <ReadonlyField label="LOP" value={additional["lop"] ?? ""} />
-            )}
-
-            {mode === "edit" ? (
-              <Input
-                label="Flying Flag"
-                labelClassName="font-medium"
-                placeholder=" "
-                value={additional["flag"] ?? ""}
-                onChange={(e) =>
-                  setAdditional((p) => ({ ...p, flag: String(e.value || "") }))
-                }
-              />
-            ) : (
-              <ReadonlyField
-                label="Flying Flag"
-                value={additional["flag"] ?? ""}
-              />
-            )}
-
-            {mode === "edit" ? (
-              <DatePicker
-                placeholder="Choose a date..."
-                label="Build Year"
-                labelClassName="font-medium"
-              />
-            ) : (
-              <ReadonlyField
-                label="Build Year"
-                value={additional["buildYear"] ?? ""}
-              />
-            )}
-
-            {mode === "edit" ? (
-              <Input
-                label="Last Strapping"
-                labelClassName="font-medium"
-                placeholder=" "
-                value={additional["lastSampling"] ?? ""}
-                onChange={(e) =>
-                  setAdditional((p) => ({ ...p, lastSampling: String(e.value || "") }))
-                }
-              />
-            ) : (
-              <ReadonlyField
-                label="Last Strapping"
-                value={additional["lastSampling"] ?? ""}
+                label="Vessel Deck Line Capacity"
+                value={additional["vesselLine"] ?? ""}
               />
             )}
 
             {mode === "edit" ? (
               <Input
                 label="Last Dry Dock"
-                labelClassName="font-medium"
+                
                 placeholder=" "
                 value={additional["lastDryDock"] ?? ""}
                 onChange={(e) =>
@@ -575,25 +435,58 @@ export default function VesselInformation({
 
             {mode === "edit" ? (
               <Input
-                label="Former Name"
-                labelClassName="font-medium"
+                label="Last Strapping"
+                
                 placeholder=" "
-                value={additional["formerName"] ?? ""}
+                value={additional["lastSampling"] ?? ""}
                 onChange={(e) =>
-                  setAdditional((p) => ({ ...p, formerName: String(e.value || "") }))
+                  setAdditional((p) => ({ ...p, lastSampling: String(e.value || "") }))
                 }
               />
             ) : (
               <ReadonlyField
-                label="Former Name"
-                value={additional["formerName"] ?? ""}
+                label="Last Strapping"
+                value={additional["lastSampling"] ?? ""}
               />
             )}
 
             {mode === "edit" ? (
               <Input
+                label="Vessel Strapping Website"
+                
+                placeholder=" "
+                value={additional["website"] ?? ""}
+                onChange={(e) =>
+                  setAdditional((p) => ({ ...p, website: String(e.value || "") }))
+                }
+              />
+            ) : (
+              <ReadonlyField
+                label="Vessel Strapping Website"
+                value={additional["website"] ?? ""}
+              />
+            )}
+          
+          </div>
+        )}
+      </div>
+
+      {/* ADDITIONAL INFORMATION */}
+      <div className="border border-gray-300 my-6 rounded">
+        <div
+          className="flex justify-between items-center bg-gray-100 px-4 py-2 cursor-pointer"
+          onClick={() => setOpen2((s) => !s)}
+        >
+          <h3 className="font-bold text-gray-700">Additional Information</h3>
+          <FontAwesomeIcon icon={open2 ? faChevronUp : faChevronDown} />
+        </div>
+
+        {open2 && (
+          <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {mode === "edit" ? (
+              <Input
                 label="Barge Company"
-                labelClassName="font-medium"
+                
                 placeholder=" "
                 value={additional["bargeCompany"] ?? ""}
                 onChange={(e) =>
@@ -607,10 +500,10 @@ export default function VesselInformation({
               />
             )}
 
-            {mode === "edit" ? (
+             {mode === "edit" ? (
               <Input
                 label="Vessel Phone"
-                labelClassName="font-medium"
+                
                 placeholder=" "
                 value={additional["phone"] ?? ""}
                 onChange={(e) =>
@@ -627,7 +520,7 @@ export default function VesselInformation({
             {mode === "edit" ? (
               <Input
                 label="Vessel Email"
-                labelClassName="font-medium"
+                
                 placeholder=" "
                 value={additional["email"] ?? ""}
                 onChange={(e) =>
@@ -640,28 +533,110 @@ export default function VesselInformation({
                 value={additional["email"] ?? ""}
               />
             )}
-
+            
             {mode === "edit" ? (
               <Input
-                label="Vessel Shipping Website"
-                labelClassName="font-medium"
+                label="Vessel Class"
+                
                 placeholder=" "
-                value={additional["website"] ?? ""}
+                value={additional["class"] ?? ""}
                 onChange={(e) =>
-                  setAdditional((p) => ({ ...p, website: String(e.value || "") }))
+                  setAdditional((p) => ({ ...p, class: String(e.value || "") }))
                 }
               />
             ) : (
               <ReadonlyField
-                label="Vessel Shipping Website"
-                value={additional["website"] ?? ""}
+                label="Vessel Class"
+                value={additional["class"] ?? ""}
+              />
+            )}
+
+             {mode === "edit" ? (
+              <DatePicker
+                placeholder="Choose a date..."
+                label="Build Year"
+                
+              />
+            ) : (
+              <ReadonlyField
+                label="Build Year"
+                value={additional["buildYear"] ?? ""}
               />
             )}
 
             {mode === "edit" ? (
               <Input
+                label="Flying Flag"
+                
+                placeholder=" "
+                value={additional["flag"] ?? ""}
+                onChange={(e) =>
+                  setAdditional((p) => ({ ...p, flag: String(e.value || "") }))
+                }
+              />
+            ) : (
+              <ReadonlyField
+                label="Flying Flag"
+                value={additional["flag"] ?? ""}
+              />
+            )}
+
+            {mode === "edit" ? (
+              <Input
+                label="Length Overall"
+                value={lengthOverall}
+                placeholder=" "
+                onChange={(e) => setLengthOverall(String(e.value || ""))}
+              />
+            ) : (
+              <ReadonlyField label="Length Overall" value={lengthOverall} />
+            )}
+
+              {mode === "edit" ? (
+              <Input
+                label="LBP"
+                placeholder=" "
+                value={additional["lbp"] ?? ""}
+                onChange={(e) =>
+                  setAdditional((p) => ({ ...p, lbp: String(e.value || "") }))
+                }
+              />
+            ) : (
+              <ReadonlyField label="LBP" value={additional["lbp"] ?? ""} />
+            )}
+
+            {mode === "edit" ? (
+              <Input
+                label="Beam"
+                value={additional["beam"] ?? ""}
+                onChange={(e) =>
+                  setAdditional((p) => ({ ...p, beam: String(e.value || "") }))
+                }
+              />
+            ) : (
+              <ReadonlyField label="Beam" value={additional["beam"] ?? ""} />
+            )}
+
+            {mode === "edit" ? (
+              <Input
+                label="Draught"
+                placeholder=" "
+                value={additional["draught"] ?? ""}
+                onChange={(e) =>
+                  setAdditional((p) => ({ ...p, draught: String(e.value || "") }))
+                }
+              />
+            ) : (
+              <ReadonlyField
+                label="Draught"
+                value={additional["draught"] ?? ""}
+              />
+            )}
+            
+             {mode === "edit" ? (
+              <Input
                 label="Gross Reg. Tons"
-                labelClassName="font-medium"
+                
                 placeholder=" "
                 value={additional["gross"] ?? ""}
                 onChange={(e) =>
@@ -678,7 +653,7 @@ export default function VesselInformation({
             {mode === "edit" ? (
               <Input
                 label="Net Reg. Tons"
-                labelClassName="font-medium"
+                
                 placeholder=" "
                 value={additional["net"] ?? ""}
                 onChange={(e) => setAdditional((p) => ({ ...p, net: String(e.value || "") }))}
@@ -692,37 +667,38 @@ export default function VesselInformation({
 
             {mode === "edit" ? (
               <Input
-                label="Vessel Class"
-                labelClassName="font-medium"
+                label="Ballast"
+                
                 placeholder=" "
-                value={additional["class"] ?? ""}
+                value={additional["ballast"] ?? ""}
                 onChange={(e) =>
-                  setAdditional((p) => ({ ...p, class: String(e.value || "") }))
+                  setAdditional((p) => ({ ...p, ballast: String(e.value || "") }))
                 }
               />
             ) : (
               <ReadonlyField
-                label="Vessel Class"
-                value={additional["class"] ?? ""}
+                label="Ballast"
+                value={additional["ballast"] ?? ""}
               />
             )}
 
             {mode === "edit" ? (
               <Input
-                label="Ocean Going Barge"
-                labelClassName="font-medium"
+                label="Manifold Location"
+                
                 placeholder=" "
-                value={additional["oceanGoing"] ?? ""}
+                value={additional["manifold"] ?? ""}
                 onChange={(e) =>
-                  setAdditional((p) => ({ ...p, oceanGoing: String(e.value || "") }))
+                  setAdditional((p) => ({ ...p, manifold: String(e.value || "") }))
                 }
               />
             ) : (
               <ReadonlyField
-                label="Ocean Going Barge"
-                value={additional["oceanGoing"] ?? ""}
+                label="Manifold Location"
+                value={additional["manifold"] ?? ""}
               />
             )}
+
           </div>
         )}
       </div>
@@ -741,7 +717,7 @@ export default function VesselInformation({
           <div className="p-4 space-y-4">
             {mode === "edit" && (
               <Button themeColor="primary" onClick={addOwner}>
-                <FontAwesomeIcon icon={faPlus} className="mr-2" /> Add
+                <FontAwesomeIcon icon={faPlus} className="mr-1" /> Add Vessel Owner
               </Button>
             )}
 

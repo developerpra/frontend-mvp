@@ -137,11 +137,11 @@ export default function VesselPage() {
     <>
       {/* Filters Card */}
       <div className="border border-gray-300 rounded-lg p-4 my-6">
-        <h3 className="font-bold text-gray-700">Filters</h3>
+        <h3 className="font-bold text-gray-700 pb-4">Filters</h3>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="space-y-1">
-            <label className="font-medium">Vessel</label>
+            <label>Vessel</label>
             <DropDownList
               className=" !bg-transparent"
               data={vesselNames}
@@ -153,7 +153,7 @@ export default function VesselPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="font-medium">Vessel Type</label>
+            <label>Vessel Type</label>
             <DropDownList
               className=" !bg-transparent"
               data={vesselTypes}
@@ -165,8 +165,8 @@ export default function VesselPage() {
           </div>
 
           <Input
-            labelClassName="font-medium"
             label="IMO Number"
+            placeholder=" "
             value={filters?.imo}
             onChange={(e) => setFilters({ ...filters, imo: e.value ?? "" })}
           />
@@ -176,7 +176,7 @@ export default function VesselPage() {
               <label className="ml-2 mt-0.5">Active</label>
             </div>
 
-            <label className="font-medium">Branch</label>
+            <label>Branch</label>
             <DropDownList
               className=" !bg-transparent"
               data={uniqueBranches} // Fix: Used computed unique branches instead of vessels?.branch

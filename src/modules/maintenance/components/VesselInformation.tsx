@@ -19,6 +19,7 @@ export default function VesselTabs({ className }: VesselTabsProps) {
 
   return (
     <TabStrip
+      // selected={2}
       selected={selected}
       onSelect={handleSelect}
       scrollable={true}

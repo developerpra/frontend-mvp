@@ -159,13 +159,13 @@ export default function Compartments({
 
           <Input
             label="Number of Compt."
-            labelClassName="font-medium"
+            
             placeholder=" "
             className=""
           />
           <Input
             label="Starting Compt. #"
-            labelClassName="font-medium"
+            
             placeholder=" "
             className=""
           />
