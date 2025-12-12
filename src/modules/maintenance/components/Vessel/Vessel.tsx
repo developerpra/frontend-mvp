@@ -6,15 +6,15 @@ import {
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { Checkbox, Input } from "@progress/kendo-react-inputs";
 import { Button, ButtonGroup } from "@progress/kendo-react-buttons";
-import { Grid, GridCellProps, GridColumn, GridPageChangeEvent, GridRowProps, GridRowClickEvent } from "@progress/kendo-react-grid";
+import { Grid, GridCellProps, GridColumn, GridPageChangeEvent, GridRowProps } from "@progress/kendo-react-grid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { vessels } from "../../dummyData/VesselsData";
 import VesselBranches from "@/shared/ui/VesselBranches";
 import BranchSelectionModel from "@/shared/ui/BranchSelectionModel";
+import { useGetVesselListQuery } from "@/services/api/apiSlice";
 
 const vesselTypes = ["Barge", "Tow", "Ship"];
-const vesselNames = ["EBL-2869", "EBL-2900", "EBL - 2971 & 2972"];
+// const vesselNames = ["EBL-2869", "EBL-2900", "EBL - 2971 & 2972"]; // Kept as reference if needed, but not used for API filter dropdown if dynamic
 const branches = [
   {
     group: "US - East Coast",
@@ -47,64 +47,87 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
     vesselType: "",
     imo: "",
     branch: "",
-    status: "",
   });
 
   const [status, setStatus] = useState<"Active" | "Inactive">("Active");
-
-  const [data, setData] = useState(vessels);
 
   const [page, setPage] = useState({
     skip: 0,
     take: 10,
   });
 
-  const uniqueBranches = useMemo(() => Array.from(new Set(vessels.map(v => v.branch))), []);
+  // Calculate API params
+  const queryParams = {
+    pageIndex: Math.floor(page.skip / page.take),
+    pageSize: page.take,
+    VesselName: filters.vessel || undefined,
+    VesselType: filters.vesselType || undefined,
+    ImoNumber: filters.imo || undefined,
+    Active: status === "Active",
+  };
+
+  const { data: apiResponse, isLoading } = useGetVesselListQuery(queryParams);
+  const data = apiResponse?.data?.items || [];
+  const total = apiResponse?.data?.totalItems || 0;
 
   const handlePageChange = (e: GridPageChangeEvent) => {
     setPage(e.page);
   };
 
   const handleSearch = () => {
-    let filtered = vessels;
+     // Search is automatic via state change passing to query
+     // This function might be redundant if inputs drive state directly, 
+     // but if "Search" button is desired to trigger fetch, we would need to separate
+     // "filter input state" from "query params state".
+     // For now, inputs update 'filters' state which updates 'queryParams' which triggers refetch.
+     // If button is mandatory for trigger, we should have a separate 'searchParams' state.
+     // However, the existing code called 'handleSearch' on button click, implying manual trigger.
+     // Let's refactor to support manual trigger.
+  };
 
-    if (filters.vessel) {
-      filtered = filtered.filter((d) =>
-        d.vesselName.toLowerCase().includes(filters.vessel.toLowerCase())
-      );
-    }
+  // State for effective search params
+  const [searchParams, setSearchParams] = useState(queryParams);
 
-    if (filters.vesselType) {
-      filtered = filtered.filter((d) => d.vesselType === filters.vesselType);
-    }
+  // Update searchParams when page changes (pagination should always trigger)
+  // But we also want to keep current filters.
+  // Actually, standard pattern with RTK Query is:
+  // Inputs update local state -> User clicks Search -> Update query args state -> Refetch
+  
+  // Let's use a separate effect or just update searchParams on button click
+  
+  // NOTE: Re-implementing correctly for "Click to Search" pattern
+  const [activeFilters, setActiveFilters] = useState({ ...filters, status });
 
-    if (filters.imo) {
-      filtered = filtered.filter((d) => d.id.toString().includes(filters.imo));
-    }
+  const effectiveQueryParams = {
+    pageIndex: Math.floor(page.skip / page.take),
+    pageSize: page.take,
+    VesselName: activeFilters.vessel || undefined,
+    VesselType: activeFilters.vesselType || undefined,
+    ImoNumber: activeFilters.imo || undefined,
+    Active: activeFilters.status === "Active",
+  };
+  
+  const { data: searchResult, isLoading: isSearchLoading } = useGetVesselListQuery(effectiveQueryParams);
+  const gridData = searchResult?.data?.items || [];
+  const gridTotal = searchResult?.data?.totalItems || 0;
 
-    if (filters.branch) {
-      filtered = filtered.filter((d) =>
-        d.branch.includes(filters.branch)
-      );
-    }
-
-    if (status) {
-      filtered = filtered.filter((d) => d.status === status);
-    }
-
-    setData(filtered);
+  const onSearchClick = () => {
+      setPage({ skip: 0, take: 10 }); // Reset to first page on new search
+      setActiveFilters({ ...filters, status });
   };
 
   const clearFilters = () => {
-    setFilters({
+    const resetFilters = {
       vessel: "",
       vesselType: "",
       imo: "",
       branch: "",
-      status: "",
-    });
+      status: "Active" as "Active" | "Inactive",
+    };
+    setFilters(resetFilters);
     setStatus("Active");
-    setData(vessels);
+    setActiveFilters(resetFilters);
+    setPage({ skip: 0, take: 10 });
   };
 
   const ActionCell = (props: GridCellProps) => (
@@ -115,7 +138,12 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
           title="Edit"
           onClick={(e) => {
             e.stopPropagation(); 
-            onEdit?.(props.dataItem);
+            // Map API item to expected format for onEdit if needed
+             // The API item has vesselId, but form might expect id. 
+             // We should pass the item as is, but ensure onEdit handles it.
+             // Based on previous turn, Information.tsx uses data.id.
+             // API list item has vesselId. We might need to normalize.
+            onEdit?.({ ...props.dataItem, id: props.dataItem.vesselId });
           }}
           className="text-primary cursor-pointer"
         >
@@ -127,7 +155,7 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
           title="Edit"
           onClick={(e) => {
             e.stopPropagation(); // Prevent row click
-            onEdit?.(props.dataItem);
+            onEdit?.({ ...props.dataItem, id: props.dataItem.vesselId });
           }}
           className="text-primary cursor-pointer"
         >
@@ -146,13 +174,13 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
   );
 
   const rowRender = (trElement: React.ReactElement<HTMLTableRowElement>, props: GridRowProps) => {
-    const isInactive = props.dataItem.status === "Inactive";
+    const isInactive = !props.dataItem.active;
     const trProps = {
       ...trElement.props,
       className: `${trElement.props.className || ""} ${isInactive ? "!bg-gray-100 !text-gray-400" : ""} cursor-pointer hover:bg-gray-50`,
       onClick: (e: React.MouseEvent) => {
         if (trElement.props.onClick) trElement.props.onClick(e);
-        onView?.(props.dataItem);
+        onView?.({ ...props.dataItem, id: props.dataItem.vesselId });
       }
     };
     return React.cloneElement(trElement, { ...trProps }, trElement.props.children);
@@ -167,14 +195,11 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="space-y-1">
             <label>Vessel</label>
-            <DropDownList
-              className=" !bg-transparent"
-              data={vesselNames}
-              value={filters?.vessel}
-              onChange={(e) =>
-                setFilters({ ...filters, vessel: e.value ?? "" })
-              }
-            />
+             <Input
+                value={filters.vessel}
+                onChange={(e) => setFilters({ ...filters, vessel: String(e.value || "") })}
+                placeholder=" "
+              />
           </div>
 
           <div className="space-y-1">
@@ -182,7 +207,7 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
             <DropDownList
               className=" !bg-transparent"
               data={vesselTypes}
-              value={filters?.vesselType}
+              value={filters.vesselType}
               onChange={(e: DropDownListChangeEvent) =>
                 setFilters({ ...filters, vesselType: e.value ?? "" })
               }
@@ -192,23 +217,24 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
           <Input
             label="IMO Number"
             placeholder=" "
-            value={filters?.imo}
-            onChange={(e) => setFilters({ ...filters, imo: e.value ?? "" })}
+            value={filters.imo}
+            onChange={(e) => setFilters({ ...filters, imo: String(e.value || "") })}
           />
           <div className="space-y-1 relative">
             <div className="flex absolute right-1">
-              <Checkbox defaultChecked={true} size={"small"} />
+              <Checkbox defaultChecked={true} size={"small"} disabled />
               <label className="ml-2 mt-0.5">Active</label>
             </div>
 
             <label>Branch</label>
             <DropDownList
               className=" !bg-transparent"
-              data={uniqueBranches} 
-              value={filters?.branch}
+              data={[]} // No branch data in list API, making this empty or could use uniqueBranches if we had them
+              value={filters.branch}
               onChange={(e: DropDownListChangeEvent) =>
                 setFilters({ ...filters, branch: e.value ?? "" })
               }
+              disabled={true} // Disable as not supported by API yet
             />
           </div>
 
@@ -218,11 +244,21 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
               Vessel Status
             </label>
             <ButtonGroup>
-              <Button togglable={true} className="w-16">
+              <Button 
+                togglable={true} 
+                className="w-16" 
+                selected={status === "Active"}
+                onClick={() => setStatus("Active")}
+              >
                 Active
               </Button>
 
-              <Button togglable={true} className="w-16">
+              <Button 
+                togglable={true} 
+                className="w-16"
+                selected={status === "Inactive"}
+                onClick={() => setStatus("Inactive")}
+              >
                 Inactive
               </Button>
             </ButtonGroup>
@@ -230,8 +266,8 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
 
           {/* Buttons */}
           <div className="flex gap-4">
-            <Button themeColor="primary" onClick={handleSearch}>
-              Search
+            <Button themeColor="primary" onClick={onSearchClick} disabled={isSearchLoading}>
+              {isSearchLoading ? "Searching..." : "Search"}
             </Button>
             <Button onClick={clearFilters}>Clear Filters</Button>
           </div>
@@ -242,10 +278,10 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
       <div className="border border-gray-300 rounded-lg mt-4 overflow-auto">
         <Grid
           className="min-w-[700px] w-full"
-          data={data?.slice(page.skip, page.skip + page.take)}
-          skip={page?.skip}
-          take={page?.take}
-          total={data?.length}
+          data={gridData}
+          skip={page.skip}
+          take={page.take}
+          total={gridTotal}
           pageable={{
             pageSizes: [5, 10, 20, 50],
             buttonCount: 5,
@@ -260,7 +296,7 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
             title="Vessel Name"
           />
           <GridColumn field="vesselType" title="Vessel Type" />
-          <GridColumn field="id" title="IMO Number" />
+          <GridColumn field="imoNumber" title="IMO Number" />
           <GridColumn
             field="branch"
             title="Branch"

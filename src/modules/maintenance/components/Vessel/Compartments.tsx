@@ -99,12 +99,12 @@ export default function Compartments({
     (field: keyof (typeof rows)[0]) => (props: GridCellProps) => {
       const item = props.dataItem;
 
-      // VIEW MODE → Only show text
+      // VIEW MODE: Only show text
       if (mode === "view") {
         return <td className="px-2">{item[field]}</td>;
       }
 
-      // EDIT MODE → Input
+      // EDIT MODE: Input
       return (
         <td>
           <Input

@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import ReadonlyField from "@/shared/ui/ReadOnly";
 import { Grid, GridColumn, GridCellProps } from "@progress/kendo-react-grid";
 import BranchSelectionModel, { BranchData } from "@/shared/ui/BranchSelectionModel";
-import { useUpdateVesselMutation, useCreateVesselMutation } from "@/services/api/apiSlice";
+import { useUpdateVesselMutation, useCreateVesselMutation, useGetVesselInformationQuery } from "@/services/api/apiSlice";
 
 // --- Validation Schema ---
 const vesselOwnerSchema = z.object({
@@ -75,16 +75,63 @@ const vesselDataSchema = z.object({
 type VesselFormValues = z.infer<typeof vesselDataSchema>;
 
 // --- Constants ---
+const DROPDOWN_DATA = {
+  vesselType: {
+    B: "Barge",
+    S: "Ship",
+    T: "Tow",
+  },
+  volumeUnit: {
+    Gals: "Gals",
+    Bbls: "Bbls",
+    M3: "M3",
+    Liters: "Liters",
+  },
+  gaugeUnit: {
+    F: "Feet",
+    M: "Meters",
+    mm: "Millimeters",
+    cm: "Centimeters",
+  },
+  draftUnit: {
+    F: "F",
+    M: "M",
+  },
+  vetUnits: ["MT", "M3", "Bbls"],
+  connectionType: ["Manual", "Hemetic", "MMC", "TKT"],
+  sandPipe: {
+    Slotted: "Slotted",
+    "Un-Slotted": "Un-Slotted",
+    None: "None",
+  },
+  bargeCompany: {
+    S: "Segregated",
+    N: "Non-Segregated",
+  },
+  ballast: {
+    S: "Segregated",
+    N: "Non-Segregated",
+  },
+};
+
+const getDropdownItems = (key: keyof typeof DROPDOWN_DATA) => {
+  const data = DROPDOWN_DATA[key];
+  if (Array.isArray(data)) {
+    return data.map((item) => ({ text: item, value: item }));
+  }
+  return Object.entries(data).map(([k, v]) => ({ text: v, value: k }));
+};
+
 const DROPDOWN_OPTIONS = {
-  vesselType: ["Barge", "Tow", "Ship"],
-  volumeUnit: ["BBL", "USG", "Liters", "Cubic Meters", "Barrels"],
-  gaugeUnit: ["IN", "CM", "MM", "FT"],
-  draftUnit: ["FT", "M", "CM"],
-  vetUnits: ["USG", "BBL", "Liters", "Cubic Meters"],
-  connectionType: ["Flange", "Quick Connect", "Threaded", "Welded", "Other"],
-  sandPipe: ["Yes", "No"],
-  bargeCompany: ["Marine LLC", "Ocean Transport Co", "Harbor Services", "Coastal Shipping", "Other"],
-  ballast: ["Yes", "No"],
+  vesselType: getDropdownItems("vesselType"),
+  volumeUnit: getDropdownItems("volumeUnit"),
+  gaugeUnit: getDropdownItems("gaugeUnit"),
+  draftUnit: getDropdownItems("draftUnit"),
+  vetUnits: getDropdownItems("vetUnits"),
+  connectionType: getDropdownItems("connectionType"),
+  sandPipe: getDropdownItems("sandPipe"),
+  bargeCompany: getDropdownItems("bargeCompany"),
+  ballast: getDropdownItems("ballast"),
 };
 
 // --- Reusable Form Field Component ---
@@ -94,7 +141,7 @@ interface FormFieldProps {
   label: string | React.ReactNode;
   mode: "edit" | "view";
   type?: "text" | "select" | "date" | "checkbox";
-  options?: string[];
+  options?: any[]; // Updated to accept object array for Kendo DropDownList
   placeholder?: string;
   className?: string;
 }
@@ -119,6 +166,11 @@ const FormField = ({
           let displayValue = value;
           if (type === "date" && value) {
              try { displayValue = new Date(value as string).toLocaleDateString(); } catch {}
+          }
+          if (type === "select" && options.length > 0) {
+            // Find the display text for the stored value
+             const selectedOption = options.find((opt: any) => opt.value === value);
+             if (selectedOption) displayValue = selectedOption.text;
           }
           if (type === "checkbox") {
              return (
@@ -155,8 +207,10 @@ const FormField = ({
               <DropDownList
                 className="!bg-transparent w-full"
                 data={options}
-                value={value}
-                onChange={(e) => onChange(e.value)}
+                textField="text"
+                dataItemKey="value"
+                value={options.find((opt: any) => opt.value === value) || null}
+                onChange={(e) => onChange(e.value.value)} // Store just the 'value'
               />
             )}
 
@@ -196,44 +250,58 @@ export default function VesselInformation({
 }) {
   const [updateVessel, { isLoading: isUpdating }] = useUpdateVesselMutation();
   const [createVessel, { isLoading: isCreating }] = useCreateVesselMutation();
-  const isLoading = isUpdating || isCreating;
+  
+  // Fetch full details if ID is available
+  const { data: apiResponse, isLoading: isFetching } = useGetVesselInformationQuery(data?.id, {
+    skip: !data?.id,
+  });
+
+  const isLoading = isUpdating || isCreating || isFetching;
+
+  const vesselDetails = apiResponse?.data;
+  const sourceData = vesselDetails || data;
 
   const defaultValues: VesselFormValues = {
-    vesselName: data?.vesselName ?? "",
-    vesselType: data?.vesselType ?? "",
-    imo: data?.imo ?? "",
-    active: data?.active ?? true,
-    oceanGoing: false,
-    branch: data?.branch ?? "",
-    vetUnits: data?.vetUnits ?? "",
-    draftUnit: data?.draftUnit ?? "",
-    gaugeUnit: data?.gaugeUnit ?? "",
-    volumeUnit: data?.volumeUnit ?? "",
-    vesselCapacity: data?.vesselCapacity ?? "",
-    compartments: data?.compartments ?? "",
-    sandPipe: data?.sandPipe ?? "",
-    lengthOverall: data?.lengthOverall ?? "",
-    formerName: data?.additional?.formerName ?? "",
-    connectionType: data?.additional?.connectionType ?? "",
-    vesselLine: data?.additional?.vesselLine ?? "",
-    lastDryDock: data?.additional?.lastDryDock ?? "",
-    lastSampling: data?.additional?.lastSampling ?? "",
-    website: data?.additional?.website ?? "",
-    bargeCompany: data?.additional?.bargeCompany ?? "",
-    phone: data?.additional?.phone ?? "",
-    email: data?.additional?.email ?? "",
-    class: data?.additional?.class ?? "",
-    buildYear: data?.additional?.buildYear ?? "",
-    flag: data?.additional?.flag ?? "",
-    lbp: data?.additional?.lbp ?? "",
-    beam: data?.additional?.beam ?? "",
-    draught: data?.additional?.draught ?? "",
-    gross: data?.additional?.gross ?? "",
-    net: data?.additional?.net ?? "",
-    ballast: data?.additional?.ballast ?? "",
-    manifold: data?.additional?.manifold ?? "",
-    owners: data?.owners ?? [],
-    notes: data?.notes ?? "",
+    vesselName: sourceData?.vesselName ?? "",
+    vesselType: sourceData?.vesselType === "B" ? "Barge" : (sourceData?.vesselType === "S" ? "Ship" : (sourceData?.vesselType ?? "")), // Basic mapping attempt
+    imo: sourceData?.imo ?? (sourceData?.vesselCode?.trim() || ""),
+    active: sourceData?.active ?? true,
+    oceanGoing: sourceData?.oceanGoingBarges ?? false,
+    branch: sourceData?.branch ?? "",
+    vetUnits: sourceData?.vefUnit ?? "",
+    draftUnit: sourceData?.vesselDraftUnit ?? "",
+    gaugeUnit: sourceData?.vesselGaugeUnit ?? "",
+    volumeUnit: sourceData?.vesselVolUnit ?? "",
+    vesselCapacity: sourceData?.vesselCapacity ?? "",
+    compartments: sourceData?.compartments ?? "",
+    sandPipe: sourceData?.standPipe ?? "",
+    lengthOverall: sourceData?.lengthOverall ?? "",
+    formerName: sourceData?.formerNames ?? (sourceData?.additional?.formerName ?? ""),
+    connectionType: sourceData?.vesselConnectionType ?? (sourceData?.additional?.connectionType ?? ""),
+    vesselLine: sourceData?.vessCapacityLine ?? (sourceData?.additional?.vesselLine ?? ""),
+    lastDryDock: sourceData?.lastDock ?? (sourceData?.additional?.lastDryDock ?? ""),
+    lastSampling: sourceData?.lastStrapping ?? (sourceData?.additional?.lastSampling ?? ""),
+    website: sourceData?.strappingChartURL ?? (sourceData?.additional?.website ?? ""),
+    bargeCompany: sourceData?.bargeCompany ?? (sourceData?.additional?.bargeCompany ?? ""),
+    phone: sourceData?.vesselPhone ?? (sourceData?.additional?.phone ?? ""),
+    email: sourceData?.vesselEmail ?? (sourceData?.additional?.email ?? ""),
+    class: sourceData?.class ?? (sourceData?.additional?.class ?? ""),
+    buildYear: sourceData?.builtYear ?? (sourceData?.additional?.buildYear ?? ""),
+    flag: sourceData?.flyingFlag ?? (sourceData?.additional?.flag ?? ""),
+    lbp: sourceData?.lbp ?? (sourceData?.additional?.lbp ?? ""),
+    beam: sourceData?.breadth ?? (sourceData?.additional?.beam ?? ""),
+    draught: sourceData?.draught ?? (sourceData?.additional?.draught ?? ""),
+    gross: sourceData?.grossRegTons ?? (sourceData?.additional?.gross ?? ""),
+    net: sourceData?.netRegTons ?? (sourceData?.additional?.net ?? ""),
+    ballast: sourceData?.vesselBallast ?? (sourceData?.additional?.ballast ?? ""),
+    manifold: sourceData?.manifoldLocation ?? (sourceData?.additional?.manifold ?? ""),
+    owners: sourceData?.vesselOwners?.map((o: any) => ({
+      id: o.vesselOwnerId,
+      name: o.ownerName,
+      eff: o.effectiveDate,
+      exp: o.expirationDate,
+    })) ?? (sourceData?.owners ?? []),
+    notes: sourceData?.notes ?? "",
   };
 
   const { control, handleSubmit, reset, setValue, watch } = useForm<VesselFormValues>({
@@ -242,8 +310,53 @@ export default function VesselInformation({
   });
 
   useEffect(() => {
-    reset(defaultValues);
-  }, [data, reset]);
+    if (sourceData) {
+      // Re-calculation of defaultValues inside effect to ensure latest data is used
+       const newValues: VesselFormValues = {
+        vesselName: sourceData?.vesselName ?? "",
+        vesselType: sourceData?.vesselType === "B" ? "Barge" : (sourceData?.vesselType === "S" ? "Ship" : (sourceData?.vesselType ?? "")),
+        imo: sourceData?.imo ?? (sourceData?.vesselCode?.trim() || ""),
+        active: sourceData?.active ?? true,
+        oceanGoing: sourceData?.oceanGoingBarges ?? false,
+        branch: sourceData?.branch ?? "",
+        vetUnits: sourceData?.vefUnit ?? "",
+        draftUnit: sourceData?.vesselDraftUnit ?? "",
+        gaugeUnit: sourceData?.vesselGaugeUnit ?? "",
+        volumeUnit: sourceData?.vesselVolUnit ?? "",
+        vesselCapacity: sourceData?.vesselCapacity ?? "",
+        compartments: sourceData?.compartments ?? "",
+        sandPipe: sourceData?.standPipe ?? "",
+        lengthOverall: sourceData?.lengthOverall ?? "",
+        formerName: sourceData?.formerNames ?? (sourceData?.additional?.formerName ?? ""),
+        connectionType: sourceData?.vesselConnectionType ?? (sourceData?.additional?.connectionType ?? ""),
+        vesselLine: sourceData?.vessCapacityLine ?? (sourceData?.additional?.vesselLine ?? ""),
+        lastDryDock: sourceData?.lastDock ?? (sourceData?.additional?.lastDryDock ?? ""),
+        lastSampling: sourceData?.lastStrapping ?? (sourceData?.additional?.lastSampling ?? ""),
+        website: sourceData?.strappingChartURL ?? (sourceData?.additional?.website ?? ""),
+        bargeCompany: sourceData?.bargeCompany ?? (sourceData?.additional?.bargeCompany ?? ""),
+        phone: sourceData?.vesselPhone ?? (sourceData?.additional?.phone ?? ""),
+        email: sourceData?.vesselEmail ?? (sourceData?.additional?.email ?? ""),
+        class: sourceData?.class ?? (sourceData?.additional?.class ?? ""),
+        buildYear: sourceData?.builtYear ?? (sourceData?.additional?.buildYear ?? ""),
+        flag: sourceData?.flyingFlag ?? (sourceData?.additional?.flag ?? ""),
+        lbp: sourceData?.lbp ?? (sourceData?.additional?.lbp ?? ""),
+        beam: sourceData?.breadth ?? (sourceData?.additional?.beam ?? ""),
+        draught: sourceData?.draught ?? (sourceData?.additional?.draught ?? ""),
+        gross: sourceData?.grossRegTons ?? (sourceData?.additional?.gross ?? ""),
+        net: sourceData?.netRegTons ?? (sourceData?.additional?.net ?? ""),
+        ballast: sourceData?.vesselBallast ?? (sourceData?.additional?.ballast ?? ""),
+        manifold: sourceData?.manifoldLocation ?? (sourceData?.additional?.manifold ?? ""),
+        owners: sourceData?.vesselOwners?.map((o: any) => ({
+          id: o.vesselOwnerId,
+          name: o.ownerName,
+          eff: o.effectiveDate,
+          exp: o.expirationDate,
+        })) ?? (sourceData?.owners ?? []),
+        notes: sourceData?.notes ?? "",
+      };
+      reset(newValues);
+    }
+  }, [sourceData, reset]);
 
   const { fields, append, remove } = useFieldArray({
     control,
