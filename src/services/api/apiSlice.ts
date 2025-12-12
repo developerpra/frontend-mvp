@@ -106,15 +106,10 @@ export const apiSlice = createApi({
       query: (id) => `/VesselInformation/${id}`, 
       providesTags: (result, error, id) => [{ type: 'Vessel', id }],
     }),
-    // query: Get a vessel by ID
-    getVessel: builder.query<any, string>({
-      query: (id) => `/vessels/${id}`, 
-      providesTags: (result, error, id) => [{ type: 'Vessel', id }],
-    }),
     // mutation: Update a vessel
-    updateVessel: builder.mutation<any, { id: string; data: any }>({
+    updateVessel: builder.mutation<any, { id: string | number; data: any }>({
       query: ({ id, data }) => ({
-        url: `/vessels/${id}`,
+        url: `/VesselInformation/${id}`,
         method: 'PUT',
         body: data,
       }),
@@ -123,7 +118,7 @@ export const apiSlice = createApi({
     // mutation: Create a vessel
     createVessel: builder.mutation<any, any>({
       query: (data) => ({
-        url: '/vessels',
+        url: '/VesselInformation',
         method: 'POST',
         body: data,
       }),
@@ -133,7 +128,6 @@ export const apiSlice = createApi({
 });
 
 export const { 
-  useGetVesselQuery, 
   useUpdateVesselMutation, 
   useCreateVesselMutation,
   useGetVesselInformationQuery,

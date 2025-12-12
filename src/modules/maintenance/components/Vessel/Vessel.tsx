@@ -56,49 +56,11 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
     take: 10,
   });
 
-  // Calculate API params
-  const queryParams = {
-    pageIndex: Math.floor(page.skip / page.take),
-    pageSize: page.take,
-    VesselName: filters.vessel || undefined,
-    VesselType: filters.vesselType || undefined,
-    ImoNumber: filters.imo || undefined,
-    Active: status === "Active",
-  };
-
-  const { data: apiResponse, isLoading } = useGetVesselListQuery(queryParams);
-  const data = apiResponse?.data?.items || [];
-  const total = apiResponse?.data?.totalItems || 0;
-
-  const handlePageChange = (e: GridPageChangeEvent) => {
-    setPage(e.page);
-  };
-
-  const handleSearch = () => {
-     // Search is automatic via state change passing to query
-     // This function might be redundant if inputs drive state directly, 
-     // but if "Search" button is desired to trigger fetch, we would need to separate
-     // "filter input state" from "query params state".
-     // For now, inputs update 'filters' state which updates 'queryParams' which triggers refetch.
-     // If button is mandatory for trigger, we should have a separate 'searchParams' state.
-     // However, the existing code called 'handleSearch' on button click, implying manual trigger.
-     // Let's refactor to support manual trigger.
-  };
-
-  // State for effective search params
-  const [searchParams, setSearchParams] = useState(queryParams);
-
-  // Update searchParams when page changes (pagination should always trigger)
-  // But we also want to keep current filters.
-  // Actually, standard pattern with RTK Query is:
-  // Inputs update local state -> User clicks Search -> Update query args state -> Refetch
-  
-  // Let's use a separate effect or just update searchParams on button click
-  
-  // NOTE: Re-implementing correctly for "Click to Search" pattern
+  // State for effective search params (used for API call)
   const [activeFilters, setActiveFilters] = useState({ ...filters, status });
 
-  const effectiveQueryParams = {
+  // Calculate API params based on active filters and pagination
+  const queryParams = {
     pageIndex: Math.floor(page.skip / page.take),
     pageSize: page.take,
     VesselName: activeFilters.vessel || undefined,
@@ -107,13 +69,17 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
     Active: activeFilters.status === "Active",
   };
   
-  const { data: searchResult, isLoading: isSearchLoading } = useGetVesselListQuery(effectiveQueryParams);
-  const gridData = searchResult?.data?.items || [];
-  const gridTotal = searchResult?.data?.totalItems || 0;
+  const { data: apiResponse, isLoading } = useGetVesselListQuery(queryParams);
+  const gridData = apiResponse?.data?.items || [];
+  const gridTotal = apiResponse?.data?.totalItems || 0;
+
+  const handlePageChange = (e: GridPageChangeEvent) => {
+    setPage(e.page);
+  };
 
   const onSearchClick = () => {
-      setPage({ skip: 0, take: 10 }); // Reset to first page on new search
-      setActiveFilters({ ...filters, status });
+    setPage({ skip: 0, take: 10 }); // Reset to first page on new search
+    setActiveFilters({ ...filters, status });
   };
 
   const clearFilters = () => {
@@ -122,11 +88,10 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
       vesselType: "",
       imo: "",
       branch: "",
-      status: "Active" as "Active" | "Inactive",
     };
     setFilters(resetFilters);
     setStatus("Active");
-    setActiveFilters(resetFilters);
+    setActiveFilters({ ...resetFilters, status: "Active" });
     setPage({ skip: 0, take: 10 });
   };
 
@@ -266,8 +231,8 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
 
           {/* Buttons */}
           <div className="flex gap-4">
-            <Button themeColor="primary" onClick={onSearchClick} disabled={isSearchLoading}>
-              {isSearchLoading ? "Searching..." : "Search"}
+            <Button themeColor="primary" onClick={onSearchClick} disabled={isLoading}>
+              {isLoading ? "Searching..." : "Search"}
             </Button>
             <Button onClick={clearFilters}>Clear Filters</Button>
           </div>
@@ -297,6 +262,13 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
           />
           <GridColumn field="vesselType" title="Vessel Type" />
           <GridColumn field="imoNumber" title="IMO Number" />
+          <GridColumn 
+            field="active" 
+            title="Status" 
+            cell={(props) => (
+              <td>{props.dataItem.active ? "Active" : "Inactive"}</td>
+            )}
+          />
           <GridColumn
             field="branch"
             title="Branch"
