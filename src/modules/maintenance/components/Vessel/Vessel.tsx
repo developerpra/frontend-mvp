@@ -114,7 +114,7 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
           type="button"
           title="Edit"
           onClick={(e) => {
-            e.stopPropagation(); // Prevent row click
+            e.stopPropagation(); 
             onEdit?.(props.dataItem);
           }}
           className="text-primary cursor-pointer"
@@ -151,7 +151,6 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
       ...trElement.props,
       className: `${trElement.props.className || ""} ${isInactive ? "!bg-gray-100 !text-gray-400" : ""} cursor-pointer hover:bg-gray-50`,
       onClick: (e: React.MouseEvent) => {
-        // @ts-expect-error onClick might not be in the type definition but exists on props
         if (trElement.props.onClick) trElement.props.onClick(e);
         onView?.(props.dataItem);
       }
@@ -205,7 +204,7 @@ export default function VesselPage({ onEdit, onView }: VesselPageProps) {
             <label>Branch</label>
             <DropDownList
               className=" !bg-transparent"
-              data={uniqueBranches} // Fix: Used computed unique branches instead of vessels?.branch
+              data={uniqueBranches} 
               value={filters?.branch}
               onChange={(e: DropDownListChangeEvent) =>
                 setFilters({ ...filters, branch: e.value ?? "" })

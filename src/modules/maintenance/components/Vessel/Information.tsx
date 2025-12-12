@@ -558,9 +558,9 @@ export default function VesselInformation({
           onClose={() => setBranchSelectionOpen(false)}
           mode={mode}
           initialData={{
-            type: "individual", // Default or you can add a field to schema
+            type: "individual", 
             value: currentBranch || null,
-            active: true // Or link to active state
+            active: true 
           }}
           onSave={handleBranchSave}
         />
